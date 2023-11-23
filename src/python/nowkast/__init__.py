@@ -1,77 +1,66 @@
+from dataclasses import dataclass
 
+from .base import Point
 
-class Libp2p:
-    """
+@dataclass
+class Member: pass
 
+@dataclass
+class Content(Point): pass
 
-    """
-    pass
+@dataclass
+class RankchoiceSelection: pass
 
+chatid = str
 
-@dataclasses
-class DataMeshPeer:
-    """
+@dataclass
+class Rankchoice:
+    owner: Member
+    admin: list[Member]
+    visible: bool
+    users: list[Member]
 
-    network setup
-    authentication
+    description: Point
 
-    """
+    premise_gate_list: list[Content] 
+    rank_choice_list: list[Content]
     
+    selections: list[RankchoiceSelection]
 
-
-
-    @classmethod
-    def get_instance(cls): pass
-
-
-
-
-class PubSubEventType(Enum):
+@dataclass
+class Chat:
+    member_list: list[Member]
+    content_list: list[Content]
     
+    def get_content(self,since_datetime): pass
+    def push_content(self,push_datetime,content): pass
 
-class NotificationHandler:
+@dataclass
+class NowkastStateProxy:
+    chat_dict: dict[chatid,Chat] = None
 
-    await def handle_pubsub(self,
-        pubsub_key: str,
-        pubsub_event_type: PubSubEventType,
-        pubsub_data: dict) -> None: pass
-
-
-class StateHandle:
-    """
-
-    messaging encryption, underlying backend (Supabase, Ethereum, etc.) and setup (login, auth, password, etc.) should be abstrcated behind this class, such that once an app has an initialized version of this object, it is assumed that everything needed to set that up has already magically happened in the backgroun
-
-    in this system, there is only pubsub.  a messaging setup is just a two party pubsub
-
-    """
-
-
-    await def block_read(self,position,length) -> byte[]: pass
-    await def block_write(self,position,length,data) -> None: pass
-
-    await def pubsub_send(self,pubsub_key,data,callback_fn) -> None: pass
-    await def pubsub_subscribe(self,
-        pubsub_key: str,
-        notification_handler: NotificationHandler) -> None: pass
-
-    await def pubsub_unsubscribe(self,
-        pubsub_key: str,
-        notification_handler: NotificationHandler) -> None: pass
-
-    await def get_local_kvstore(self) -> dict: 
-        """used to get the local version of the key-value store used for things like data that needs to go into the UI
-        because the dict does not have a notification mechansim, a Pubsub should be used instead of polling to notify when to process new information
-        """
-        pass
+    def obtain_chat(self,chat_id): pass
 
 
 
 
-class SqlaProxy:
-    """
 
-    since SqlAlchemy is available in Pyodide, it makes sense to think about having the underlying backend proxied over ZeroServer Data Mesh
 
-    """
-    pass
+
+
+
+
+@dataclass
+class Realm: pass
+
+@dataclass
+class User: pass
+
+@dataclass
+class Membership[dict[str,User]]: pass
+
+
+@dataclass
+class Chat: pass
+
+
