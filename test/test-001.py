@@ -1,10 +1,24 @@
-@pytest.fixture
-def create_rank(): pass
+from nowkast import *
 
-def test_rank_001(create_rank):
+import pytest
+
+@pytest.fixture
+def create_nkr(): 
+    r = Runtime.get_instance()
+
+    return r
+
+def test_rank_001(create_nkr):
   """create a simple rank, populate, and run a sample
   
   """
-  rank = create_rank
+  nkr = create_nkr
 
-  rank.desc = Point
+
+  nkr.create_all()
+  s = nkr.get_sm_session()
+
+  s.add( nkr.gen_users() )
+  s.add( nkr.gen_realm() )
+
+  s.commit()

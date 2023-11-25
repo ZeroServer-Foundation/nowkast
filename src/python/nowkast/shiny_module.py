@@ -1,8 +1,6 @@
-from shiny import module, Inputs, Outputs, Session, ui
+from pprint import pformat as pf
 
-nkr = None
-
-class NowkastRuntime:
+class ShinyWrapper:
 
     instance = None
 
@@ -10,19 +8,27 @@ class NowkastRuntime:
     def get_instance(cls):
         
         if cls.instance == None:
-            cls.instance = NowkastRuntime()
+            from . import Runtime 
+            cls.instance = ShinyWrapper()
+            cls.instance.runtime = Runtime()
         return cls.instance
 
-
-
-    @module.ui
-    def rank_ui(self):
-        pass
-
-    @module.server
-    def rank_server(self,input, output, session):        pass
+   
 
 
 
     def build_ui_widget(self,*args,**kwargs):
-        return ui.div("WIDGET")
+        from shiny import module, ui
+
+        @module.ui
+        def rank_ui(self):
+            pass
+
+        @module.server
+        def rank_server(self, input, output, session):        
+            pass
+        
+        return ui.div(pf( pf(locals()) ))
+
+
+
