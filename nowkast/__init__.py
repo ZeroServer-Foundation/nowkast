@@ -5,7 +5,7 @@ from dataclasses import dataclass
 # from . import Point
 
 
-from sqlmodel import Field, SQLModel, create_engine, Session
+from sqlmodel import Field, SQLModel
 
 def dc(x):
     return x
@@ -65,19 +65,37 @@ class State:
 
 
 
+
+
+
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+
 class Runtime:
 
     def __init__(self,*args,**kwargs):
-        self.sql_url = "sqlite:///database.db"
-        self.engine = create_engine(self.sql_url, echo=True)
+        self.sql_url = "sqlite+aiosqlite:///database.db"
+        self.engine = create_async_engine(self.sql_url, echo=True) 
 
-    def create_all(self):
-        SQLModel.metadata.create_all(self.engine)
-
-    def get_sm_session(self):
-        r = Session(self.engine)
+    async def get_sm_session(self):
+        r = await AsyncSession(self.engine)
         self.last_session = r
         return r
+
+    async def init_db():
+        async with self.engine.begin() as conn:
+            await conn.run_sync(SQLModel.metadata.drop_all)
+            await conn.run_sync(SQLModel.metadata.create_all)
+
+    async def get_session() -> AsyncSession:
+        async_session = sessionmaker(
+            engine, class_=AsyncSession, expire_on_commit=False
+        )
+        async with async_session() as session:
+            yield session
+
+    ###
 
     instance = None
 
@@ -89,6 +107,9 @@ class Runtime:
         return cls.instance
 
     def gen_realms(cls):
+
+
+        
         r = []
         r.append( Realm(name="main") )
         return r
