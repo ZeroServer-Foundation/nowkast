@@ -8,12 +8,14 @@ class ShinyWrapper:
     def get_instance(cls):
         
         if cls.instance == None:
-            from . import Runtime 
             cls.instance = ShinyWrapper()
-            cls.instance.runtime = Runtime()
+            
+            import Pyro5.api
+            nameserver = Pyro5.api.locate_ns()
+            uri = nameserver.lookup("nkr")
+            nkr = Pyro5.api.Proxy(uri)
+            cls.instance.runtime = nkr
         return cls.instance
-
-   
 
 
 
@@ -28,7 +30,10 @@ class ShinyWrapper:
         def rank_server(self, input, output, session):        
             pass
         
-        return ui.div(pf( pf(locals()) ))
-
+        r = ui.div(
+                ui.pre(pf( pf(locals()) )),
+                ui.input_text("send","send","send")
+            )
+        return r
 
 

@@ -78,12 +78,12 @@ class Runtime:
         self.sql_url = "sqlite+aiosqlite:///database.db"
         self.engine = create_async_engine(self.sql_url, echo=True) 
 
-    async def get_sm_session(self):
-        r = await AsyncSession(self.engine)
+    def get_sm_session(self):
+        r = AsyncSession(self.engine)
         self.last_session = r
         return r
 
-    async def init_db():
+    async def init_db(self):
         async with self.engine.begin() as conn:
             await conn.run_sync(SQLModel.metadata.drop_all)
             await conn.run_sync(SQLModel.metadata.create_all)
@@ -107,9 +107,6 @@ class Runtime:
         return cls.instance
 
     def gen_realms(cls):
-
-
-        
         r = []
         r.append( Realm(name="main") )
         return r
@@ -120,7 +117,6 @@ class Runtime:
 
 
 
-from .shiny_module import *
 
 
 

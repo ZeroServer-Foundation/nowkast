@@ -13,20 +13,25 @@ def create_nkr():
 
     return r
 
-def test_rank_001(create_nkr):
+@pytest.mark.asyncio
+async def test_rank_001(create_nkr):
     """create a simple rank, populate, and run a sample
   
     """
     nkr = create_nkr
 
 
-    if False:
-        nkr.create_all()
+    if True:
+        await nkr.init_db()
         s = nkr.get_sm_session()
-    
-        [ [ s.add(i) for i in j ] for j in [ nkr.gen_users(), nkr.gen_realms() ] ]
 
-        s.commit()
+        for j in [ nkr.gen_users(), nkr.gen_realms() ]:
+            for i in j:
+                # breakpoint()
+                s.add(i)
+
+        breakpoint()
+        await s.commit()
 
 
 
