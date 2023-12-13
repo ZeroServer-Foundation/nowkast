@@ -2,115 +2,83 @@ from typing import Optional, List
 
 from dataclasses import dataclass
 
-# from . import Point
+from sqlmodel import SQLModel, Field, Relationship
 
+from zstate.ext.sqlmodel import StorablePlugin
 
-from sqlmodel import Field, SQLModel
+from zstate.debug import *
 
 def dc(x):
     return x
-
-
-
-@dc
-class Realm(SQLModel, table=True): 
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str 
 
 @dc
 class User(SQLModel, table=True): 
 
     id: Optional[int] = Field(default=None, primary_key=True)
+    
     name: str 
+    content_list: List["Content"] = Relationship(back_populates="creator")
+    rankchoice_list: List["Rankchoice"] = Relationship(back_populates="owner")
 
 
 @dc
-class Content(SQLModel, table=False): 
+class Content(SQLModel, table=True): 
 
     id: Optional[int] = Field(default=None, primary_key=True)
-
-    creater: User 
-
-
+    creater: Optional[User] = Relationship(back_populates="content_list")
 
 @dc
-class Rankchoice(SQLModel, table=False):
+class Rankchoice(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
-    owner: User
+    owner: Optional[User] = Relationship(back_populates="rankchoice_list")
     
     #admin: list[Member]
     #visible: bool
     #users: list[Member]
 
-    desc: Content
+    desc: Optional[int] = Field(default=None, foreign_key="content.id")
 
-    premise_gate_list: list[Content] 
-    rank_choice_list: list[Content]
+    # premise_gate_list: List[int] 
+    # rank_choice_list: List[inContent]
     
-    selections: list[Content]
-
+    # selections: List[Content] = Relationship("")
 
 @dc
-class Chat:
-    member_list: list[User]
-    content_list: list[Content]
+class Chat(SQLModel, table=True):
+
+    id: Optional[int] = Field(default=None, primary_key=True)
     
+    # member_list: list[User] = None
+    # content_list: list[Content] = None
+
+@dc
+class Realm(SQLModel, table=True): 
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+    name: str 
+
+    # user_dict: dict[str,User] = None
+    # chat_list: list[Chat] = None
 
 @dc
 class State:
-    chat_list: list[Chat] = None
+    """
+
+    """
+    realm_dict: dict[str,Realm] = None
 
 
+@dc
+class NowkastPlugin(StorablePlugin):
 
-
-
-
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel.ext.asyncio.session import AsyncSession
-
-
-class Runtime:
-
-    def __init__(self,*args,**kwargs):
-        self.sql_url = "sqlite+aiosqlite:///database.db"
-        self.engine = create_async_engine(self.sql_url, echo=True) 
-
-    def get_sm_session(self):
-        r = AsyncSession(self.engine)
-        self.last_session = r
-        return r
-
-    async def init_db(self):
-        async with self.engine.begin() as conn:
-            await conn.run_sync(SQLModel.metadata.drop_all)
-            await conn.run_sync(SQLModel.metadata.create_all)
-
-    async def get_session() -> AsyncSession:
-        async_session = sessionmaker(
-            engine, class_=AsyncSession, expire_on_commit=False
-        )
-        async with async_session() as session:
-            yield session
-
-    ###
-
-    instance = None
-
-    @classmethod
-    def get_instance(cls):
-        
-        if cls.instance == None:
-            cls.instance = Runtime()
-        return cls.instance
-
-    def gen_realms(cls):
+    def gen_realms(self):
         r = []
         r.append( Realm(name="main") )
         return r
-    def gen_users(cls):
+    def gen_users(self):
         r = []
         r.append( User(name="wally") )
         return r
