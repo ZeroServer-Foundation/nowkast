@@ -1,12 +1,22 @@
 from typing import Any
 
 from zstate.ext.starlette import MountablePlugin
-from zstate.ext.shiny import Point
+from zstate.ext.shiny import Point, BaseShiny
 
 from zstate.debug import *
 
 from pprint import pformat as pf
 
+p = Point
+
+dash_root=Point("root", [ 
+    p("topnav/left", [
+        ""
+    ]),
+    p("topnav/right", [
+        ""
+    ])  
+])
 
 class NowkastMountablePlugin(MountablePlugin):
 
